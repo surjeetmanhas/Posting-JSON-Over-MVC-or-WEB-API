@@ -1,0 +1,81 @@
+@Scripts.Render("~/bundles/jquery")
+
+@*<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />*@
+@{
+    ViewBag.Title = "Temp";
+}
+
+<h2>Temp</h2>
+
+<script type="text/javascript">
+
+    var student = { contact_name: "Scott", class_name: "HP" };
+
+    $(document).ready(function () {
+
+  
+
+        //MVC  Implementation:  #1
+        //Note : By removing contentType property, the default of "application/x-www-form-urlencoded" is used. 
+        // The problem with this is, once the data posted gets 'large', it gets truncated 
+        // Switching to Web API when posting large data Doing so, We could pass  stringified JSON via a regular application/json content type 
+        //and we don't run into the length issue. Don't know why ASP .NET MVC controller actions doesn't work this way (I'm guessing the model binder is getting in the way)
+
+
+        $.ajax({
+            type: 'post',
+            url: '/student/testaction',   //MVC
+            data: "student=" + JSON.stringify(student),
+            datatype: 'text',
+            //contentType: 'application/json',   // dont use application/json insetad use application/x-www-form-urlencoded (default)
+            success: function (data) {
+                console.log(data);
+                console.log((JSON.parse(data)).contact_name);
+            }
+        });
+
+      @*
+
+        //MVC  Implementation: #2
+
+        $.ajax({
+            type: 'post',
+            url: '/student/testaction2',   //MVC
+            data: { contactName: "Scott", className: "HP" },   //breaking into individual properties
+            datatype: 'json',
+            //contentType: 'application/json',
+            success: function (data) {
+                console.log(data);
+                console.log((JSON.parse(data)).contact_name);
+            }
+        });
+
+  *@
+
+
+        @*
+        //Web API Implementation:
+
+        $.ajax({
+            type: 'post',
+            url: '/api/studentapi/testaction',   //web api
+                    //data: { '': 'hello' },   //works
+             data: { '': JSON.stringify(student) },   //works
+                    // data: JSON.stringify(student),   //does not work
+            datatype: 'json',
+            success: function(data) {
+                console.log(data);
+                console.log((JSON.parse(data)).contact_name);
+            }
+        });
+
+        *@
+
+    });
+
+    //var testFunc = (function () {}());   IIFE
+
+
+</script>
+
