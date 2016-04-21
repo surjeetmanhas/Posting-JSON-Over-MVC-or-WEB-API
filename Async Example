@@ -1,0 +1,118 @@
+The following 2 snippets both post data to WEB API.
+Basically the data is posted with default Content-Type of form-urlEncoded  And  content has to have 
+‘ ‘ :  “JSON as String”
+
+
+
+        public async Task<string> CallParseandLoadAsync( RequestContent rc)
+        {
+            using (HttpClient httpClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true }))
+            {
+
+                var requestObject = new RequestContent() { FileName = rc.FileName, LoadType = rc.LoadType };
+                JObject requestContentJson = JObject.FromObject(requestObject);
+                var requestBody = new FormUrlEncodedContent(new[]
+                {
+                new KeyValuePair<string, string>("", requestContentJson.ToString())
+                });
+
+                HttpResponseMessage response =
+                    await httpClient.PostAsync("http://localhost:53320/api/parsefiletodb", requestBody);
+
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return responseBody;
+            }
+        }
+
+
+
+var postParameters = { file_name: responseJson.message, load_type: $("input:radio[name='uploadRadioOptions']:checked").val() }
+
+        var request = $.ajax({
+            dataType: "json",
+            url: GetLoadFiletoDatabaseUrl(),
+            method: "POST",
+            data: {
+                '': JSON.stringify(postParameters)
+    }
+        });
+
+
+postasJSONAsync is another alternative  but it requires the Type that is used to create JSON to be shared between Client 
+and Web API.
+
+http://www.asp.net/web-api/overview/advanced/calling-a-web-api-from-a-net-client
+
+In the following example …. Product type has \to be shared between client and WEBAPI  projects.
+// HTTP POST
+var gizmo = new Product() { Name = "Gizmo", Price = 100, Category = "Widget" };
+response = await client.PostAsJsonAsync("api/products", gizmo);
+if (response.IsSuccessStatusCode)
+{
+    // Get the URI of the created resource.
+    Uri gizmoUrl = response.Headers.Location;
+}
+
+
+Get example 
+http://www.tugberkugurlu.com/archive/my-take-on-task-base-asynchronous-programming-in-c-sharp-5-0-and-asp-net-mvc-web-applications
+
+
+
+
+
+ 
+
+=%7B%22file_name%22%3A%22C%3A%5C%5CTFSSource%5C%5CCBIT%5C%5CInvestments%5C%5CRAMS%5C%5CWebApp%5C%5CDev%5C%5CRams%5C%5CRams.Client%5C%5CApp_Data%5C%5Cfile1.csv%22%2C%22load_type%22%3A%22Re-Investments%22
+%7D
+
+
+
+
+API Side Code:
+
+
+        [HttpPost]
+        [Route("api/FileUpload/LoadFiletoDatabase", Name = ("LoadFiletoDatabase"))]
+        public async  Task<HttpResponseMessage> LoadFiletoDatabase([FromBody] string requestBody)
+        {
+            var requestParams = JsonConvert.DeserializeObject<RequestContent>(requestBody);
+
+            var parseResponse=  await CallParseandLoadAsync(requestParams);
+            if (parseResponse != null)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, "File parsing and load to DB completed");
+            }
+            else
+                return Request.CreateResponse(HttpStatusCode.InternalServerError,
+                    "Parse and Load Failed");
+        }
+
+
+
+
+
+[HttpPost]
+        [Route("api/ParseFileToDb", Name = ("ParseFileToDb"))]
+        public HttpResponseMessage ParseFileToDb([FromBody] string requestBody)
+        {
+
+            JObject request = JObject.Parse(requestBody);
+            var file_name = (string) request.SelectToken("file_name");
+            var load_type = (string)request.SelectToken("load_type");
+
+
+            if (!File.Exists(file_name))
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Server did not find file " + file_name + " for uploading");
+            }
+
+Thanks,
+
+Surjeet Manhas
+AIG Corporate Business IT
+50 Danbury Road, 2nd Floor, Wilton, CT 06897 
+Office: +1 203 529 9364  Cell: +1 203 837 7407
+surjeet.manhas@aig.com | www.aig.com
+
