@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><script src="Web%20API%20Model%20Binding%20in%20ASP.NET%20MVC%206_files/a_002" async=""></script>
+<meta charset="UTF-8">
+		<style type="text/css">
+			.recentcomments a {
+				display: inline !important;
+				padding: 0 !important;
+				margin: 0 !important;
+			}
+
+			table.recentcommentsavatartop img.avatar, table.recentcommentsavatarend img.avatar {
+				border: 0px;
+				margin: 0;
+			}
+
+			table.recentcommentsavatartop a, table.recentcommentsavatarend a {
+				border: 0px !important;
+				background-color: transparent !important;
+			}
+
+			td.recentcommentsavatarend, td.recentcommentsavatartop {
+				padding: 0px 0px 1px 0px;
+				margin: 0px;
+			}
+
+			td.recentcommentstextend {
+				border: none !important;
+				padding: 0px 0px 2px 10px;
+			}
+
+			.rtl td.recentcommentstextend {
+				padding: 0px 10px 2px 0px;
+			}
+
+			td.recentcommentstexttop {
+				border: none;
+				padding: 0px 0px 0px 10px;
+			}
+
+			.rtl td.recentcommentstexttop {
+				padding: 0px 10px 0px 0px;
+			}
+		</style>
+		
+
+<div id="page" class="hfeed site">
+
+	<div id="content" class="site-content clearfix">
+		<div class="primary content-area">
+		<main id="main" class="site-main" role="main">
+
+					<div class="article-wrapper">
+				
+<article id="post-978" class="post-978 post type-post status-publish format-standard hentry category-asp-net-core">
+	<header class="entry-header">
+					<h1 class="entry-title">Web API Model Binding in ASP.NET MVC 6 (ASP.NET&nbsp;5)</h1>
+		
+		
+	</header><!-- .entry-header -->
+
+	<div class="entry-content">
+		<p>In <span class="skimlinks-unlinked">ASP.NET</span> 5, MVC and Web 
+API have been merged into a single framework called MVC 6. If you are 
+deep into Web API and MVC in the previous versions of <span class="skimlinks-unlinked">ASP.NET</span>,
+ like me, it will take some time to get used to how binding works in MVC
+ 6. Especially, if you are more into Web API in the recent past than 
+MVC, like me, you will actually feel sad to see that the things you are 
+so used to with Web API are all gone and it is different now : (.<br>
+<span id="more-978"></span></p>
+<div style="padding-left:35px;padding-right:35px;">
+<div style="border-top:1px solid rgba(0,0,0,.1);border-left:6px solid orange;padding:1px 12px;-webkit-box-shadow:0 1px 1px 0 rgba(0,0,0,.1);box-shadow:0 1px 1px 0 rgba(0,0,0,.1);">
+With the good old <span class="skimlinks-unlinked">ASP.NET</span> Web 
+API, the complex types are bound from the body, by default, and simple 
+types are bound from URI and query string. This no longer holds good in 
+Web API of MVC 6.
+</div>
+</div>
+<p>As the name indicates, MVC 6 is actually MVC, when it comes to binding. Well, it is MVC with Web API stuff bolted on, perhaps.</p>
+<div style="padding-left:35px;padding-right:35px;">
+<div style="border-top:1px solid rgba(0,0,0,.1);border-left:6px solid #7ad03a;padding:1px 12px;-webkit-box-shadow:0 1px 1px 0 rgba(0,0,0,.1);box-shadow:0 1px 1px 0 rgba(0,0,0,.1);">
+In Web API of MVC  6, binding is very <span class="skimlinks-unlinked">ASP.NET</span>
+ MVC-ish. It does not matter you have a simple type or a complex type as
+ parameter in the action method. It is bound from query string and form 
+data in that order. If you want to bind from body (JSON or XML), you 
+need to specify that using [FromBody]. Form data 
+(application/x-www-form-urlencoded) will not be bound if you use 
+[FromBody], since there is no formatter for form data. MVC 6 has input 
+formatters for JSON and XML only, out of box.
+</div>
+</div>
+<p>Let’s see some examples now.</p>
+<table style="font-size:14px;border-color:#c0c0c0;" border="1">
+<tbody><tr style="background:#eaecee;">
+<td style="width:30%;"><strong>Action Method</strong></td>
+<td><strong>Request Message</strong></td>
+<td><strong>Binding Result</strong></td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post(string name)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values?name=23" rel="nofollow">http://localhost:10725/api/values?name=23</a> HTTP/1.1<br>
+Content-Type: application/x-www-form-urlencoded<br>
+Host: localhost:10725<br>
+Content-Length: 7<p></p>
+<p>name=34
+</p></td>
+<td style="vertical-align:top;">
+name is set to 23, since query string wins over form data.
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post([FromForm]string name)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values?name=23" rel="nofollow">http://localhost:10725/api/values?name=23</a> HTTP/1.1<br>
+Content-Type: application/x-www-form-urlencoded<br>
+Host: localhost:10725<br>
+Content-Length: 7<p></p>
+<p>name=34
+</p></td>
+<td style="vertical-align:top;">
+name is set to 34, since you are specifically asking for it through [FromForm].
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post(string name)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values" rel="nofollow">http://localhost:10725/api/values</a> HTTP/1.1<br>
+Content-Type: application/x-www-form-urlencoded<br>
+Host: localhost:10725<br>
+Content-Length: 7<p></p>
+<p>name=34
+</p></td>
+<td style="vertical-align:top;">
+name is set to 34. Despite being simple type, name is set from body by 
+default, because the body is form data (one of MVC’s favorites).
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post([FromBody]string name)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values" rel="nofollow">http://localhost:10725/api/values</a> HTTP/1.1<br>
+Content-Type: application/x-www-form-urlencoded<br>
+Host: localhost:10725<br>
+Content-Length: 7<p></p>
+<p>name=34
+</p></td>
+<td style="vertical-align:top;">
+name is null, because for formatting body, we have only JSON and XML formatters.
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post([FromBody]string name)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values?name=20" rel="nofollow">http://localhost:10725/api/values?name=20</a> HTTP/1.1<br>
+Content-Type: application/json<br>
+Host: localhost:10725<br>
+Content-Length: 17<p></p>
+<p>{“name” : “john”}
+</p></td>
+<td style="vertical-align:top;">
+Error, because <span class="skimlinks-unlinked">JSON.NET</span> is not happy with the JSON provided, which is for a complex type.
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post([FromBody]string name)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values?name=20" rel="nofollow">http://localhost:10725/api/values?name=20</a> HTTP/1.1<br>
+Content-Type: application/json<br>
+Host: localhost:10725<br>
+Content-Length: 6<p></p>
+<p>“john”
+</p></td>
+<td style="vertical-align:top;">
+name is set to john, since we specifically ask for binding from body.
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post(Person p)<p></p>
+<p>public class Person<br>
+{<br>
+&nbsp;&nbsp;public string Name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ get; set; }<br>
+&nbsp;&nbsp;public int Age<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ get; set; }<br>
+}
+</p></td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values?name=20" rel="nofollow">http://localhost:10725/api/values?name=20</a> HTTP/1.1<br>
+Content-Type: application/json<br>
+Host: localhost:10725<br>
+Content-Length: 30<p></p>
+<p>{“Name” : “John”, “Age” : 24 }
+</p></td>
+<td style="vertical-align:top;">
+p.Name is set to 20 from query string. Despite being complex type, 
+Person is being bound from query string, even though body with JSON is 
+available.
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post(Person p)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values" rel="nofollow">http://localhost:10725/api/values</a> HTTP/1.1<br>
+Content-Type: application/json<br>
+Host: localhost:10725<br>
+Content-Length: 30<p></p>
+<p>{“Name” : “John”, “Age” : 24 }
+</p></td>
+<td style="vertical-align:top;">
+p is not null but p.Name is null and p.Age is 0. Despite being complex type, body is not used for binding.
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post(Person p)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values?name=b&amp;age=2" rel="nofollow">http://localhost:10725/api/values?name=b&amp;age=2</a> HTTP/1.1<br>
+Content-Type: application/json<br>
+Host: localhost:10725<br>
+Content-Length: 30<p></p>
+<p>{“Name” : “John”, “Age” : 24 }
+</p></td>
+<td style="vertical-align:top;">
+p.Name is set to b and p.Age is set to 2 from query string. Again, 
+despite being complex type, Person is being bound from query string even
+ if body is present. Query string rules!
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post([FromBody]Person p)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values?name=b&amp;age=2" rel="nofollow">http://localhost:10725/api/values?name=b&amp;age=2</a> HTTP/1.1<br>
+Content-Type: application/json<br>
+Host: localhost:10725<br>
+Content-Length: 30<p></p>
+<p>{“Name” : “John”, “Age” : 24 }
+</p></td>
+<td style="vertical-align:top;">
+p.Name and p.Age are set to John and 24 from JSON. At last, Web API 2 
+like behavior but we need to ask for body to be used for binding using 
+FromBody.
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post([FromBody]Person p, Person q)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values?name=b&amp;age=2" rel="nofollow">http://localhost:10725/api/values?name=b&amp;age=2</a> HTTP/1.1<br>
+Content-Type: application/json<br>
+Host: localhost:10725<br>
+Content-Length: 30<p></p>
+<p>{“Name” : “John”, “Age” : 24 }
+</p></td>
+<td style="vertical-align:top;">
+p is bound from JSON and q is bound from query string.
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post(Person p)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values?name=b&amp;age=2" rel="nofollow">http://localhost:10725/api/values?name=b&amp;age=2</a> HTTP/1.1<br>
+Content-Type: application/x-www-form-urlencoded<br>
+Host: localhost:10725<br>
+Content-Length: 16<p></p>
+<p>name=john&amp;age=24
+</p></td>
+<td style="vertical-align:top;">
+p.Name is set to b and p.Age is set to 2. Again, query string rules!
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post(Person p)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values" rel="nofollow">http://localhost:10725/api/values</a> HTTP/1.1<br>
+Content-Type: application/x-www-form-urlencoded<br>
+Host: localhost:10725<br>
+Content-Length: 16<p></p>
+<p>name=john&amp;age=24
+</p></td>
+<td style="vertical-align:top;">
+p.Name is set to john and p.Age is set to 24. This is similar to Web API
+ in that complex type is bound from body. In fact, this is only a 
+coincidence. As far MVC is concerned, it is doing MVC binding using the 
+form data.
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post([FromBody]Person p)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values" rel="nofollow">http://localhost:10725/api/values</a> HTTP/1.1<br>
+Content-Type: application/x-www-form-urlencoded<br>
+Host: localhost:10725<br>
+Content-Length: 16<p></p>
+<p>name=john&amp;age=24
+</p></td>
+<td style="vertical-align:top;">
+p is null, because form data cannot be bound using the formatters 
+available: JSON and XML. We are specifically asking for body but MVC 6 
+cannot read form data using the formatters.
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post([FromForm]Person p)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values" rel="nofollow">http://localhost:10725/api/values</a> HTTP/1.1<br>
+Content-Type: application/x-www-form-urlencoded<br>
+Host: localhost:10725<br>
+Content-Length: 16<p></p>
+<p>name=john&amp;age=24
+</p></td>
+<td style="vertical-align:top;">
+p.Name is set to john and p.Age is set to 24. MVC 6 is happy because now we are asking the body to be treated as form data.
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post(List&lt;Person&gt; p)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values" rel="nofollow">http://localhost:10725/api/values</a> HTTP/1.1<br>
+Content-Type: application/x-www-form-urlencoded<br>
+Host: localhost:10725<br>
+Content-Length: 52<p></p>
+<p>p[0].name=john&amp;p[0].age=24&amp;p[1].name=joe&amp;p[1].age=28
+</p></td>
+<td style="vertical-align:top;">
+p(0).Name is john<br>
+p(0).Age is 24<br>
+p(1).Name is joe<br>
+p(1).Age is 28<br>
+MVC all over the place!
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post(List&lt;string&gt; p)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values" rel="nofollow">http://localhost:10725/api/values</a> HTTP/1.1<br>
+Content-Type: application/x-www-form-urlencoded<br>
+Host: localhost:10725<br>
+Content-Length: 7<p></p>
+<p>p=1&amp;p=2
+</p></td>
+<td style="vertical-align:top;">
+p(0) = 1<br>
+p(1) = 2
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;font-family:Consolas;font-size:12px;">
+public void Post(List&lt;string&gt; p)
+</td>
+<td style="vertical-align:top;">
+POST <a href="http://localhost:10725/api/values?p=20&amp;p=30" rel="nofollow">http://localhost:10725/api/values?p=20&amp;p=30</a> HTTP/1.1<br>
+Content-Type: application/x-www-form-urlencoded<br>
+Host: localhost:10725<br>
+Content-Length: 7<p></p>
+<p>p=1&amp;p=2
+</p></td>
+<td style="vertical-align:top;">
+p(0) = 20<br>
+p(1) = 30
+</td>
+</tr>
+</tbody></table>
+	
+<div style="display: block;" id="jp-relatedposts" class="jp-relatedposts">
+	<h3 class="jp-relatedposts-headline"><em>Related</em></h3>
+<div class="jp-relatedposts-items jp-relatedposts-items-minimal"><p class="jp-relatedposts-post jp-relatedposts-post0" data-post-id="1078" data-post-format="false"><span class="jp-relatedposts-post-title"><a data-position="0" data-origin="978" rel="nofollow" title="The 201 on Building Web API with ASP.NET Core MVC
+
+Happy to announce the availability of my new book &quot;The 201 on Building Web API with ASP.NET Core MVC&quot; in Amazon. The 201 on Building Web API with ASP.NET Core MVC, is an intermediate-level guide on using ASP.NET Core and ASP.NET Core MVC's extensibility points to solve problems, as you…" href="https://lbadri.wordpress.com/2016/07/29/the-201-on-building-web-api-with-asp-net-core-mvc/" class="jp-relatedposts-post-a">The 201 on Building Web API with ASP.NET Core MVC</a></span><span class="jp-relatedposts-post-context">In "ASP.NET Core"</span></p><p class="jp-relatedposts-post jp-relatedposts-post1" data-post-id="1091" data-post-format="false"><span class="jp-relatedposts-post-title"><a data-position="1" data-origin="978" rel="nofollow" title="The 201 on Building Web API with ASP.NET Core MVC - Kindle Books
+
+The Kindle version for the paperback book &quot;The 201 on Building Web API with ASP.NET Core MVC&quot; is available now, as two separate books. The 201 on Building Web API with ASP.NET Core MVC - Book 1: Application Core is a collection of core application related topics selected from the…" href="https://lbadri.wordpress.com/2016/08/14/the-201-on-building-web-api-with-asp-net-core-mvc-kindle-books/" class="jp-relatedposts-post-a">The 201 on Building Web API with ASP.NET Core MVC - Kindle Books</a></span><span class="jp-relatedposts-post-context">In "ASP.NET Core MVC"</span></p><p class="jp-relatedposts-post jp-relatedposts-post2" data-post-id="964" data-post-format="false"><span class="jp-relatedposts-post-title"><a data-position="2" data-origin="978" rel="nofollow" title="Using Thinktecture Hawk Katana Authentication Middleware with ASP.NET 5.0 (ASP.NET MVC 6)
+
+In this post, I have covered Katana middleware versus ASP.NET 5.0 middleware. Calling a normal Katana middleware that accepts AppFunc from ASP.NET 5.0 pipeline is not that difficult. You can just use the UseOwin extension method on IApplicationBuilder, like so. By normal Katana middleware, I mean the ones like this,…" href="https://lbadri.wordpress.com/2014/11/21/using-thinktecture-hawk-katana-authentication-middleware-with-asp-net-5-0-asp-net-mvc-6/" class="jp-relatedposts-post-a">Using Thinktecture Hawk Katana Authentication Middleware with ASP.NET 5.0 (ASP.NET MVC 6)</a></span><span class="jp-relatedposts-post-context">In "ASP.NET Core"</span></p></div></div></div>			</div><!-- .entry-content -->
+
+	
+
+			
+	
+			
+
+
+		
+		</main><!-- #main -->
+	</div><!-- #primary -->
+
+
+</div><!-- #page -->
+
+
+
+</body></html>
